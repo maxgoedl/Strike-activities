@@ -27,6 +27,9 @@ python3 fetch_ilostat_irdata.py      # discovers indicator ids from the ILOSTAT
                                       # raw bulk CSVs into raw/
 python3 build_panel.py               # reshapes raw/*.csv into one tidy
                                       # country-year file in processed/
+python3 summarize_panel.py           # prints descriptive stats, coverage,
+                                      # correlations and outliers; also
+                                      # writes processed/summary_report.txt
 ```
 
 `fetch_ilostat_irdata.py --list-only` prints the matched indicators without

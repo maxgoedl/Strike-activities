@@ -1,0 +1,86 @@
+=== Overall descriptive statistics ===
+Total country-year rows: 3501
+Distinct countries/territories: 127
+Year range: 1969-2024
+
+variable                      N  missing            mean              sd       min      median             max
+--------------------------------------------------------------------------------------------------------------
+n_strikes_lockouts         3360      141          274.98          769.90      0.00       36.00        17007.00
+workers_involved           3235      266         1217.48        27525.30      0.00       15.99      1284678.00
+days_not_worked            3188      313      1926156.31     12671546.40      0.00    66488.00    340954860.00
+days_not_worked_rate        929     2572          270.32         4703.96      0.00       11.00       140530.00
+
+=== Coverage ===
+Reporting coverage by country (127 countries/territories):
+  Top 10 by number of years with any data reported:
+    Peru                            56 years  (1969-2024)
+    Panama                          55 years  (1969-2024)
+    South Africa                    55 years  (1969-2024)
+    Austria                         54 years  (1971-2024)
+    Canada                          54 years  (1969-2023)
+    Denmark                         54 years  (1971-2024)
+    Finland                         54 years  (1971-2024)
+    Mexico                          54 years  (1969-2022)
+    Netherlands                     54 years  (1971-2024)
+    Norway                          54 years  (1971-2024)
+  Bottom 10 (least-covered):
+    Bahrain                          2 years  (2009-2010)
+    Belize                           2 years  (2011-2012)
+    Cape Verde                       2 years  (1991-1997)
+    Republic of Moldova              2 years  (2023-2024)
+    Rwanda                           2 years  (1998-1999)
+    Benin                            1 years  (2018-2018)
+    Bhutan                           1 years  (2022-2022)
+    Gabon                            1 years  (2000-2000)
+    Palestine, State of              1 years  (2013-2013)
+    Togo                             1 years  (2023-2023)
+
+Reporting coverage by year (countries reporting any data, every 5th year):
+    1970:   33 countries
+    1975:   57 countries
+    1980:   68 countries
+    1985:   72 countries
+    1990:   86 countries
+    1995:   84 countries
+    2000:   81 countries
+    2005:   64 countries
+    2010:   46 countries
+    2015:   51 countries
+    2020:   33 countries
+    2024 (latest):   33 countries
+
+=== Correlations ===
+Pairwise correlations (pairwise-complete observations):
+                  n_strikes  workers_inv  days_notwkd    days_rate
+n_strikes              1.00         0.08         0.15        -0.01
+workers_inv            0.08         1.00         0.01        -0.00
+days_notwkd            0.15         0.01         1.00         0.01
+days_rate             -0.01        -0.00         0.01         1.00
+
+Key: n_strikes=Number of strikes/lockouts, workers_inv=Workers involved (thousands), days_notwkd=Days not worked, days_rate=Days not worked per 1000 workers
+
+=== Outliers / biggest recorded disputes ===
+Top 10 country-years by Number of strikes/lockouts:
+    Russian Federation              1997            17,007
+    Poland                          2008            12,765
+    Russian Federation              1998            11,162
+    Russian Federation              1995             8,856
+    Russian Federation              1996             8,278
+    Poland                          1993             7,443
+    Russian Federation              1999             7,285
+    Poland                          1992             6,351
+    Russian Federation              1992             6,273
+    Russian Federation              2004             5,933
+
+Top 10 country-years by Days not worked:
+    Brazil                          2003       340,954,860
+    Brazil                          2000       238,921,522
+    Brazil                          2007       237,156,516
+    Nigeria                         1994       233,684,771
+    Brazil                          2005       230,604,495
+    Brazil                          2006       183,776,042
+    Brazil                          2004       150,484,289
+    Brazil                          2008       143,432,937
+    Brazil                          1989       117,792,000
+    Brazil                          2002       116,620,512
+
