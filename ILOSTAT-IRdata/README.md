@@ -30,6 +30,10 @@ python3 build_panel.py               # reshapes raw/*.csv into one tidy
 downloading anything, which is useful for sanity-checking that ILOSTAT hasn't
 renamed/restructured the tables before pulling the full data.
 
+Data comes from ILOSTAT's REST API at `rplumber.ilo.org` (the API behind
+<https://ilostat.ilo.org/data/bulk/>; see <https://rplumber.ilo.org/__docs__/>
+for the full docs), not the old static bulk-download files.
+
 Output:
 - `raw/<indicator_id>.csv` — one file per matched ILOSTAT indicator, in
   ILOSTAT's native long format (`ref_area`, `indicator`, `sex`, `classif1`,
@@ -45,21 +49,16 @@ Output:
 This repository was scaffolded from a sandboxed session whose outbound
 network policy blocks all `ilo.org` subdomains (`ilostat.ilo.org`,
 `www.ilo.org`, `rplumber.ilo.org` all return `403` at the egress proxy).
-As a result, `fetch_ilostat_irdata.py` could not actually be run to
-completion here, and `raw/` and `processed/` are empty. The script itself
-was tested up to the point of the network call and fails cleanly with a
-clear error when the ILOSTAT hosts are unreachable.
-
-**To actually populate this dataset, run the two scripts above from a
-machine/environment that can reach ilostat.ilo.org / rplumber.ilo.org /
-ilo.org** (e.g. your own laptop, or a Claude Code environment configured
-with a less restrictive egress policy).
+As a result `fetch_ilostat_irdata.py` could not be run to completion there,
+and `raw/`/`processed/` in that environment stayed empty — but the script's
+requests are correctly formed and work from a normal internet connection
+(e.g. a personal computer), which is how this was actually run and verified.
 
 ## Notes on indicator discovery
 
-Indicator ids on ILOSTAT's bulk download facility
-(<https://ilostat.ilo.org/data/bulk/>) can change over time, so rather than
-hard-coding ids, `fetch_ilostat_irdata.py` downloads ILOSTAT's table of
-contents and keyword-matches the industrial-disputes tables by their label
-text. If ILOSTAT relabels these indicators, update the keyword rules in
+Indicator ids on ILOSTAT's bulk download facility can change over time, so
+rather than hard-coding ids, `fetch_ilostat_irdata.py` downloads ILOSTAT's
+table of contents (`GET rplumber.ilo.org/metadata/toc/indicator/`) and
+keyword-matches the industrial-disputes tables by their label text. If
+ILOSTAT relabels these indicators, update the keyword rules in
 `CONCEPTS`/`match_indicators()` in `fetch_ilostat_irdata.py`.

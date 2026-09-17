@@ -4,25 +4,24 @@ Download ILOSTAT Industrial Relations data (IRdata) on industrial disputes:
 number of strikes/lockouts, workers involved, and days not worked.
 
 Source: https://ilostat.ilo.org/methods/concepts-and-definitions/description-industrial-relations-data/
-Bulk download facility: https://ilostat.ilo.org/data/bulk/
+Bulk download facility: https://ilostat.ilo.org/data/bulk/ (served via the
+REST API at https://rplumber.ilo.org/__docs__/)
 
-ILOSTAT publishes each indicator as a gzipped CSV keyed by an indicator id
-(e.g. "STR_DYNE_ECO_NB_A"). Indicator ids can change over time, so rather than
-hard-coding them this script:
+Each ILOSTAT indicator has an id (e.g. "STR_DWRK_ECO_NB_A"). Indicator ids
+can change over time, so rather than hard-coding them this script:
   1. downloads the indicator table of contents,
   2. keyword-matches the industrial-disputes indicators (strikes/lockouts:
      number of cases, workers involved, days not worked),
-  3. downloads the raw bulk CSV for each match into raw/,
+  3. downloads the full data for each match into raw/,
   4. writes a manifest (raw/manifest.csv) recording which indicator id was
      matched to which concept.
 
-Requires network access to ILOSTAT's servers (ilostat.ilo.org / rplumber.ilo.org).
+Requires network access to ILOSTAT's servers (rplumber.ilo.org).
 """
 from __future__ import annotations
 
 import argparse
 import csv
-import gzip
 import io
 import sys
 from pathlib import Path
@@ -32,16 +31,11 @@ import requests
 HERE = Path(__file__).resolve().parent
 RAW_DIR = HERE / "raw"
 
-# ILOSTAT has served its bulk download facility from more than one host over
-# time; try each until one works.
-TOC_URL_CANDIDATES = [
-    "https://rplumber.ilo.org/files/indicator/table_of_contents_en.csv",
-    "https://www.ilo.org/ilostat-files/WEB_bulk_download/indicator/table_of_contents_en.csv",
-]
-CSV_BASE_CANDIDATES = [
-    "https://rplumber.ilo.org/files/indicator/{id}.csv.gz",
-    "https://www.ilo.org/ilostat-files/WEB_bulk_download/indicator/{id}.csv.gz",
-]
+# ILOSTAT's current bulk-download facility is a REST API served from
+# rplumber.ilo.org (the old static WEB_bulk_download file paths have been
+# retired). See https://rplumber.ilo.org/__docs__/ for the full API.
+TOC_URL = "https://rplumber.ilo.org/metadata/toc/indicator/"
+DATA_URL = "https://rplumber.ilo.org/data/indicator/"
 
 # Keyword rules used to pick out the three industrial-disputes indicators
 # from the full ILOSTAT table of contents. Matched case-insensitively against
@@ -56,30 +50,30 @@ HEADERS = {"User-Agent": "Mozilla/5.0 (research data pull; contact via repo issu
 TIMEOUT = 60
 
 
-def fetch(url: str) -> requests.Response:
-    resp = requests.get(url, headers=HEADERS, timeout=TIMEOUT)
+def fetch(url: str, params: dict | None = None) -> requests.Response:
+    resp = requests.get(url, params=params, headers=HEADERS, timeout=TIMEOUT)
     resp.raise_for_status()
     return resp
 
 
 def get_toc() -> list[dict]:
-    last_err = None
-    for url in TOC_URL_CANDIDATES:
-        try:
-            print(f"Fetching table of contents from {url} ...")
-            resp = fetch(url)
-            text = resp.content.decode("utf-8-sig")
-            reader = csv.DictReader(io.StringIO(text))
-            rows = list(reader)
-            if rows:
-                return rows
-        except requests.RequestException as exc:
-            print(f"  failed: {exc}")
-            last_err = exc
-    raise RuntimeError(
-        "Could not retrieve the ILOSTAT table of contents from any known URL. "
-        f"Last error: {last_err}"
-    )
+    params = {"lang": "en", "format": ".csv"}
+    print(f"Fetching table of contents from {TOC_URL} ...")
+    try:
+        resp = fetch(TOC_URL, params=params)
+    except requests.RequestException as exc:
+        raise RuntimeError(f"Could not retrieve the ILOSTAT table of contents: {exc}")
+
+    text = resp.content.decode("utf-8-sig")
+    reader = csv.DictReader(io.StringIO(text))
+    rows = list(reader)
+    if not rows:
+        preview = text[:300].replace("\n", " ")
+        raise RuntimeError(
+            "ILOSTAT table of contents came back empty. "
+            f"Response preview: {preview!r}"
+        )
+    return rows
 
 
 def label_column(toc_rows: list[dict]) -> str:
@@ -116,17 +110,15 @@ def match_indicators(toc_rows: list[dict]) -> dict[str, list[dict]]:
 
 
 def download_indicator(indicator_id: str, dest: Path) -> bool:
-    for base in CSV_BASE_CANDIDATES:
-        url = base.format(id=indicator_id)
-        try:
-            print(f"  downloading {indicator_id} from {url} ...")
-            resp = fetch(url)
-            data = gzip.decompress(resp.content) if url.endswith(".gz") else resp.content
-            dest.write_bytes(data)
-            return True
-        except (requests.RequestException, OSError) as exc:
-            print(f"    failed: {exc}")
-    return False
+    params = {"id": indicator_id, "type": "label", "format": ".csv"}
+    print(f"  downloading {indicator_id} ...")
+    try:
+        resp = fetch(DATA_URL, params=params)
+        dest.write_bytes(resp.content)
+        return True
+    except (requests.RequestException, OSError) as exc:
+        print(f"    failed: {exc}")
+        return False
 
 
 def main() -> int:
