@@ -98,6 +98,8 @@ def match_indicators(toc_rows: list[dict]) -> dict[str, list[dict]]:
         if "strikes and lockouts" not in label:
             continue
         if "days not worked" in label:
+            if "per 1000" in label or "rate" in label:
+                continue  # skip the derived rate indicator, keep the absolute count
             matches["days_not_worked"].append(row)
         elif "workers involved" in label:
             matches["workers_involved"].append(row)
