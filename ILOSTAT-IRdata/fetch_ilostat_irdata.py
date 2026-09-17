@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """
 Download ILOSTAT Industrial Relations data (IRdata) on industrial disputes:
-number of strikes/lockouts, workers involved, and days not worked.
+number of strikes/lockouts, workers involved, days not worked, and the
+days-not-worked rate per 1000 workers.
 
 Source: https://ilostat.ilo.org/methods/concepts-and-definitions/description-industrial-relations-data/
 Bulk download facility: https://ilostat.ilo.org/data/bulk/ (served via the
@@ -11,7 +12,8 @@ Each ILOSTAT indicator has an id (e.g. "STR_DWRK_ECO_NB_A"). Indicator ids
 can change over time, so rather than hard-coding them this script:
   1. downloads the indicator table of contents,
   2. keyword-matches the industrial-disputes indicators (strikes/lockouts:
-     number of cases, workers involved, days not worked),
+     number of cases, workers involved, days not worked, days-not-worked
+     rate per 1000 workers),
   3. downloads the full data for each match into raw/,
   4. writes a manifest (raw/manifest.csv) recording which indicator id was
      matched to which concept.
@@ -44,6 +46,7 @@ CONCEPTS = {
     "n_strikes_lockouts": ["strikes and lockouts"],  # number of cases (further filtered below)
     "workers_involved": ["workers involved"],
     "days_not_worked": ["days not worked"],
+    "days_not_worked_rate": ["days not worked", "per 1000"],
 }
 
 HEADERS = {"User-Agent": "Mozilla/5.0 (research data pull; contact via repo issues)"}
@@ -99,8 +102,9 @@ def match_indicators(toc_rows: list[dict]) -> dict[str, list[dict]]:
             continue
         if "days not worked" in label:
             if "per 1000" in label or "rate" in label:
-                continue  # skip the derived rate indicator, keep the absolute count
-            matches["days_not_worked"].append(row)
+                matches["days_not_worked_rate"].append(row)
+            else:
+                matches["days_not_worked"].append(row)
         elif "workers involved" in label:
             matches["workers_involved"].append(row)
         elif "number of strikes and lockouts" in label or label.startswith("strikes and lockouts"):

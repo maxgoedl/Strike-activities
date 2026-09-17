@@ -14,6 +14,9 @@ which this pull uses the aggregate ("total") rows:
 - **Workers involved in strikes and lockouts** (thousands) — the maximum
   number of workers who took part at any point during the stoppage.
 - **Days not worked due to strikes and lockouts** — total working days lost.
+- **Days not worked due to strikes and lockouts per 1000 workers** — the
+  rate ILOSTAT itself recommends for cross-country comparison, since it
+  normalizes for the size of each country's employed population.
 
 ## How to run
 
@@ -39,8 +42,9 @@ Output:
   ILOSTAT's native long format (`ref_area`, `indicator`, `sex`, `classif1`,
   `classif2`, `time`, `obs_value`, ...).
 - `raw/manifest.csv` — records which ILOSTAT indicator id was matched to
-  which concept (number of disputes / workers involved / days not worked),
-  so the mapping is auditable if ILOSTAT changes indicator codes later.
+  which concept (number of disputes / workers involved / days not worked /
+  days-not-worked rate), so the mapping is auditable if ILOSTAT changes
+  indicator codes later.
 - `processed/industrial_disputes_panel.csv` — tidy panel with one row per
   `ref_area` (country) x `time` (year) and one column per concept.
 

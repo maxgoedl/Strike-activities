@@ -88,7 +88,14 @@ def main() -> int:
         return 1
 
     OUT_DIR.mkdir(parents=True, exist_ok=True)
-    out_fieldnames = ["ref_area", "time", "n_strikes_lockouts", "workers_involved", "days_not_worked"]
+    out_fieldnames = [
+        "ref_area",
+        "time",
+        "n_strikes_lockouts",
+        "workers_involved",
+        "days_not_worked",
+        "days_not_worked_rate",
+    ]
     with OUT_PATH.open("w", newline="", encoding="utf-8") as f:
         writer = csv.DictWriter(f, fieldnames=out_fieldnames)
         writer.writeheader()
