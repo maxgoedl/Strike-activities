@@ -1,0 +1,4 @@
+__pycache__/
+*.pyc
+ILOSTAT-IRdata/raw/
+ILOSTAT-IRdata/processed/
