@@ -18,6 +18,8 @@ hard-coding them this script:
 
 Requires network access to ILOSTAT's servers (ilostat.ilo.org / rplumber.ilo.org).
 """
+from __future__ import annotations
+
 import argparse
 import csv
 import gzip

@@ -11,6 +11,8 @@ vary slightly by indicator). This script keeps the total/aggregate rows
 "Total") and reshapes to one row per country-year with one column per
 concept (number of strikes/lockouts, workers involved, days not worked).
 """
+from __future__ import annotations
+
 import csv
 from pathlib import Path
 
