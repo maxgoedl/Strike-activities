@@ -30,7 +30,17 @@ python3 build_panel.py               # reshapes raw/*.csv into one tidy
 python3 summarize_panel.py           # prints descriptive stats, coverage,
                                       # correlations and outliers; also
                                       # writes processed/summary_report.txt
+python3 plot_strikes_timeseries.py   # plots number of strikes/lockouts over
+                                      # time for a set of countries (default:
+                                      # Germany, France, UK, US) into
+                                      # processed/strikes_timeseries_*.png
 ```
+
+`plot_strikes_timeseries.py --countries "Germany" "Japan"` plots any other
+countries by their ILOSTAT `ref_area` name (check `processed/industrial_disputes_panel.csv`
+for exact spellings, e.g. "United States of America", "United Kingdom of
+Great Britain and Northern Ireland"). Requires `matplotlib` in addition to
+`requests` (see `requirements.txt`).
 
 `fetch_ilostat_irdata.py --list-only` prints the matched indicators without
 downloading anything, which is useful for sanity-checking that ILOSTAT hasn't
