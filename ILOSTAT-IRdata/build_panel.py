@@ -61,7 +61,7 @@ def main() -> int:
             print(f"WARNING: {raw_path} missing, skipping {concept}")
             continue
 
-        with raw_path.open(encoding="utf-8") as f:
+        with raw_path.open(encoding="utf-8-sig") as f:
             reader = csv.DictReader(f)
             fieldnames = reader.fieldnames or []
             country_col = find_column(fieldnames, ("ref_area.label", "ref_area"))
