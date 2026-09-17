@@ -3,13 +3,14 @@
 Combine the raw ILOSTAT industrial-disputes CSVs (downloaded by
 fetch_ilostat_irdata.py into raw/) into a single tidy country-year panel.
 
-ILOSTAT bulk CSVs follow a long SDMX-style layout with columns such as
-ref_area, indicator, source, sex, classif1, classif2, time, obs_value,
-obs_status, note_classif, note_indicator, note_source (exact columns can
-vary slightly by indicator). This script keeps the total/aggregate rows
-(no sex or economic-activity breakdown, i.e. classif columns are empty or
-"Total") and reshapes to one row per country-year with one column per
-concept (number of strikes/lockouts, workers involved, days not worked).
+ILOSTAT's data API (requested with type=label) returns a long SDMX-style
+layout with columns such as ref_area.label, indicator.label, source.label,
+sex.label, classif1.label, classif2.label, time, obs_value, obs_status.label,
+note_*.label (exact columns can vary slightly by indicator). This script
+keeps the total/aggregate rows (no sex or economic-activity breakdown, i.e.
+classif/sex columns are empty or say "Total") and reshapes to one row per
+country-year with one column per concept (number of strikes/lockouts,
+workers involved, days not worked).
 """
 from __future__ import annotations
 
@@ -22,11 +23,18 @@ OUT_DIR = HERE / "processed"
 OUT_PATH = OUT_DIR / "industrial_disputes_panel.csv"
 
 
+def find_column(fieldnames: list[str], candidates: tuple[str, ...]) -> str:
+    for candidate in candidates:
+        if candidate in fieldnames:
+            return candidate
+    raise RuntimeError(f"None of {candidates} found in columns: {fieldnames}")
+
+
 def is_total_row(row: dict) -> bool:
     for col, val in row.items():
-        if col.startswith("classif") and val and "total" not in val.lower():
-            return False
-        if col == "sex" and val and "total" not in val.lower():
+        if not val:
+            continue
+        if (col.startswith("classif") or col in ("sex", "sex.label")) and "total" not in val.lower():
             return False
     return True
 
@@ -55,32 +63,38 @@ def main() -> int:
 
         with raw_path.open(encoding="utf-8") as f:
             reader = csv.DictReader(f)
+            fieldnames = reader.fieldnames or []
+            country_col = find_column(fieldnames, ("ref_area.label", "ref_area"))
+            time_col = find_column(fieldnames, ("time",))
+            value_col = find_column(fieldnames, ("obs_value",))
+
             for row in reader:
                 if not is_total_row(row):
                     continue
-                country = row.get("ref_area")
-                year = row.get("time")
-                value = row.get("obs_value")
+                country = row.get(country_col)
+                year = row.get(time_col)
+                value = row.get(value_col)
                 if not country or not year or value in (None, ""):
                     continue
                 key = (country, year)
                 panel.setdefault(key, {"ref_area": country, "time": year})
-                panel[key][concept] = value
+                # Some indicators report the same total under more than one
+                # classification breakdown (e.g. both a "broad sector" and an
+                # "aggregate" total); keep the first one seen for stability.
+                panel[key].setdefault(concept, value)
 
     if not panel:
         print("No data rows assembled; nothing to write.")
         return 1
 
     OUT_DIR.mkdir(parents=True, exist_ok=True)
-    fieldnames = ["ref_area", "time"] + list(CONCEPT_ORDER := [
-        "n_strikes_lockouts", "workers_involved", "days_not_worked"
-    ])
+    out_fieldnames = ["ref_area", "time", "n_strikes_lockouts", "workers_involved", "days_not_worked"]
     with OUT_PATH.open("w", newline="", encoding="utf-8") as f:
-        writer = csv.DictWriter(f, fieldnames=fieldnames)
+        writer = csv.DictWriter(f, fieldnames=out_fieldnames)
         writer.writeheader()
         for key in sorted(panel):
             row = panel[key]
-            writer.writerow({fn: row.get(fn, "") for fn in fieldnames})
+            writer.writerow({fn: row.get(fn, "") for fn in out_fieldnames})
 
     print(f"Wrote {len(panel)} country-year rows to {OUT_PATH}")
     return 0
