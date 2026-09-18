@@ -58,6 +58,6 @@ Pairwise correlations (pairwise-complete observations).
 
 ## Time series
 
-![Number of strikes/lockouts](processed/strikes_timeseries_de_fr_uk_us.png)
+![Number of strikes/lockouts](ILOSTAT-IRdata/processed/strikes_timeseries_de_fr_uk_us.png)
 
-![All four indicators](processed/timeseries_all_indicators.png)
+![All four indicators](ILOSTAT-IRdata/processed/timeseries_all_indicators.png)

@@ -25,8 +25,11 @@ which this pull uses the aggregate ("total") rows:
 
 ## How to run
 
+All scripts live in `ILOSTAT-IRdata/`; `cd` there first.
+
 ```bash
-pip install requests
+cd ILOSTAT-IRdata
+pip install -r requirements.txt
 python3 fetch_ilostat_irdata.py      # discovers indicator ids from the ILOSTAT
                                       # table of contents and downloads the
                                       # raw bulk CSVs into raw/
@@ -52,10 +55,10 @@ python3 generate_report.py           # regenerates both charts (with their
 ```
 
 Both plotting scripts take `--countries "Germany" "Japan"` to plot any other
-countries by their ILOSTAT `ref_area` name (check `processed/industrial_disputes_panel.csv`
-for exact spellings, e.g. "United States of America", "United Kingdom of
-Great Britain and Northern Ireland"). Requires `matplotlib` in addition to
-`requests` (see `requirements.txt`).
+countries by their ILOSTAT `ref_area` name (check
+`ILOSTAT-IRdata/processed/industrial_disputes_panel.csv` for exact spellings,
+e.g. "United States of America", "United Kingdom of Great Britain and
+Northern Ireland").
 
 `fetch_ilostat_irdata.py --list-only` prints the matched indicators without
 downloading anything, which is useful for sanity-checking that ILOSTAT hasn't
@@ -65,7 +68,7 @@ Data comes from ILOSTAT's REST API at `rplumber.ilo.org` (the API behind
 <https://ilostat.ilo.org/data/bulk/>; see <https://rplumber.ilo.org/__docs__/>
 for the full docs), not the old static bulk-download files.
 
-Output:
+Output (all under `ILOSTAT-IRdata/`):
 - `raw/<indicator_id>.csv` — one file per matched ILOSTAT indicator, in
   ILOSTAT's native long format (`ref_area`, `indicator`, `sex`, `classif1`,
   `classif2`, `time`, `obs_value`, ...).

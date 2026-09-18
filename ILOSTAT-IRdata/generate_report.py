@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """
-Assemble REPORT.md: a single Markdown page with the key summary-stats
-tables and time-series charts, meant to be read directly on GitHub (which
-renders Markdown tables and embedded images automatically).
+Assemble REPORT.md at the repo root: a single Markdown page with the key
+summary-stats tables and time-series charts, meant to be read directly on
+GitHub (which renders Markdown tables and embedded images automatically).
 
 Regenerates the two time-series charts (using each plotting script's
 default countries) and embeds them alongside markdown-formatted versions
@@ -18,7 +18,8 @@ import plot_strikes_timeseries as pst
 import summarize_panel as sp
 
 HERE = Path(__file__).resolve().parent
-REPORT_PATH = HERE / "REPORT.md"
+REPO_ROOT = HERE.parent
+REPORT_PATH = REPO_ROOT / "REPORT.md"
 
 
 def md_table(headers: list[str], rows: list[list[str]]) -> list[str]:
@@ -125,9 +126,9 @@ def main() -> int:
     lines.append("")
     lines.append("## Time series")
     lines.append("")
-    lines.append(f"![Number of strikes/lockouts]({strikes_png.relative_to(HERE).as_posix()})")
+    lines.append(f"![Number of strikes/lockouts]({strikes_png.relative_to(REPO_ROOT).as_posix()})")
     lines.append("")
-    lines.append(f"![All four indicators]({all_png.relative_to(HERE).as_posix()})")
+    lines.append(f"![All four indicators]({all_png.relative_to(REPO_ROOT).as_posix()})")
     lines.append("")
 
     REPORT_PATH.write_text("\n".join(lines), encoding="utf-8")
