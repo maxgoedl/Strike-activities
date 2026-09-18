@@ -34,9 +34,15 @@ python3 plot_strikes_timeseries.py   # plots number of strikes/lockouts over
                                       # time for a set of countries (default:
                                       # Germany, France, UK, US) into
                                       # processed/strikes_timeseries_*.png
+python3 plot_all_series_timeseries.py # plots all four indicators (2x2 small
+                                      # multiples, one panel per indicator,
+                                      # consistent country colors) for a set
+                                      # of countries (default: Germany,
+                                      # France, UK, US, Mexico) into
+                                      # processed/timeseries_all_indicators.png
 ```
 
-`plot_strikes_timeseries.py --countries "Germany" "Japan"` plots any other
+Both plotting scripts take `--countries "Germany" "Japan"` to plot any other
 countries by their ILOSTAT `ref_area` name (check `processed/industrial_disputes_panel.csv`
 for exact spellings, e.g. "United States of America", "United Kingdom of
 Great Britain and Northern Ireland"). Requires `matplotlib` in addition to
